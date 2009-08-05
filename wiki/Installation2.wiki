@@ -1,5 +1,5 @@
 #labels Featured
-Cubusmail is relatively easy to install. All you need is at least Java JDK 5.0 and a servlet container like Tomcat or Jetty. No external database is necessary. Cubusmail supports IMAP and SMTP with or without SSL.  
+Cubusmail is relatively easy to install. All you need is at least JDK 5.0 and a servlet container like Tomcat or Jetty. No external database is necessary. Cubusmail supports IMAP and SMTP with or without SSL.  
 
 
 Steps to deploy Cubusmail to a servlet container.
