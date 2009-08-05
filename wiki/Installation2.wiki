@@ -38,4 +38,4 @@ JAVA_OPTS="$JAVA_OPTS -Dcubus.config=/etc/cubusmail/cubus.properties"
 
 6. Delploy the cubusmail.war file to the container.
 
-7. Run the container and start the application with {{{http://localhost:8080/cubusmail/}}}
+7. Run the container and start the application with {{{http://myserver.com:8080/cubusmail/}}}
