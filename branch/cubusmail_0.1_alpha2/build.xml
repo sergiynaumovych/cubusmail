@@ -1,0 +1,173 @@
+<project name="Cubusmail" basedir="." default="war">
+
+	<property name="src.dir" value="./src" />
+	<property name="res.dir" value="./resources" />
+	<property name="build.dir" value="./build" />
+	<property name="lib.dir" value="./lib" />	
+	<property name="dist.dir" value="./dist" />
+	<property name="war.dir" value="${build.dir}/war" />
+	<property name="war.file.name" value="cubusmail.war" />
+	<property name="war.file" value="${build.dir}/${war.file.name}" />
+	<property name="docs.dir" value="./docs" />
+	<property name="etc.dir" value="./etc" />
+	<property name="client.classes.dir" value="${build.dir}/client-classes" />
+	<property name="server.classes.dir" value="${build.dir}/server-classes" />
+	<property name="test.src.dir" value="test" />
+	<property name="test.classes.dir" value="${build.dir}/test-classes" />
+	<property name="test.results.dir" value="${build.dir}/test-results" />
+	<property name="gwt.dir" value="./gwtlib" />
+	<property name="webapp.lib.dir" value="./war/WEB-INF/lib" />
+
+	<path id="release.files">
+		<fileset dir="${build.dir}" includes="${war.file.name}"/>
+		<fileset dir="${etc.dir}" includes="cubus.properties"/>
+		<fileset dir="${docs.dir}" includes="INSTALL.txt"/>
+		<fileset dir="${docs.dir}" includes="LICENSE.txt"/>
+		<fileset dir="${docs.dir}" includes="README.txt"/>
+	</path>
+
+	
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+		
+	<target name="compile-server">
+		<mkdir dir="${server.classes.dir}" />
+		<javac destdir="${server.classes.dir}" srcdir="${src.dir}" excludes="**/client/**">
+			<classpath>
+				<fileset dir="${webapp.lib.dir}" includes="**/*.jar" />
+				<fileset dir="${lib.dir}" includes="**/*.jar" />
+				<fileset dir="${gwt.dir}" includes="gwt-user.jar" />
+			</classpath>
+		</javac>
+		<copy todir="${server.classes.dir}">
+			<fileset dir="${res.dir}" />
+		</copy>
+	</target>
+	
+
+	<target name="compile-client">
+		<mkdir dir="${client.classes.dir}" />
+		<javac destdir="${client.classes.dir}" srcdir="${src.dir}" includes="**/client/**">
+			<classpath>
+				<fileset dir="${webapp.lib.dir}" includes="**/*.jar" />
+				<fileset dir="${lib.dir}" includes="**/*.jar" />
+				<fileset dir="${gwt.dir}" includes="gwt-user.jar" />
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="compile-test" depends="compile-server, compile-client">
+        <mkdir dir="${test.classes.dir}"/>
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}">
+            <classpath>
+				<pathelement location="${src.dir}" />
+                <pathelement location="${server.classes.dir}"/>
+                <pathelement location="${client.classes.dir}"/>
+				<fileset dir="${webapp.lib.dir}" includes="**/*.jar" />
+				<fileset dir="${lib.dir}" includes="**/*.jar" />
+				<fileset dir="${gwt.dir}" includes="gwt-user.jar" />
+            </classpath>
+        </javac>
+		<copy todir="${test.classes.dir}" >
+			<fileset dir="${test.src.dir}" >
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="compile-gwt">
+		<copy todir="${war.dir}" >
+			<fileset dir="./war" >
+			    <exclude name="WEB-INF/classes/" />
+			    <exclude name="WEB-INF/lib/" />
+			    <exclude name="cubusmail/" />
+			</fileset>
+		</copy>
+		<java dir="." classname="com.google.gwt.dev.Compiler" fork="true" failonerror="true" maxmemory="1024m">			
+            <jvmarg value="-Xss1024k"/>
+			<arg value="-war" />
+			<arg value="${war.dir}" />
+			<arg value="-style" />
+			<arg value="OBF" /> 
+			<arg value="com.cubusmail.gwtui.Cubusmail"/>
+			<classpath>
+				<pathelement path="${src.dir}" />
+				<pathelement path="${res.dir}" />
+				<pathelement location="${gwt.dir}/gwt-user.jar" />
+				<pathelement location="${gwt.dir}/gwt-dev-linux.jar" />
+				<fileset dir="${lib.dir}" includes="**/*.jar" />
+				<pathelement location="${webapp.lib.dir}/hibernate4gwt-1.1.1.jar" />
+				<pathelement location="${webapp.lib.dir}/ejb3-persistence.jar" />
+				<pathelement location="${webapp.lib.dir}/hibernate-annotations.jar" />
+			</classpath>
+		</java>
+	</target>
+	
+	<target name="war" depends="compile-server, compile-gwt">		
+		<war destfile="${war.file}" basedir="${war.dir}" webxml="${war.dir}/WEB-INF/web.xml">
+			<classes dir="${server.classes.dir}" />
+			<lib dir="${webapp.lib.dir}"/>
+		</war>
+	</target>
+
+	<target name="demo" depends="clean">
+		<antcall target="compile"/>
+		<replace file="resources/com/cubusmail/gwtui/client/CubusMessages.properties">
+			<replacetoken>demo_username=</replacetoken>
+			<replacevalue>demo_username=demo1</replacevalue>
+		</replace>
+		<replace file="resources/com/cubusmail/gwtui/client/CubusMessages.properties">
+			<replacetoken>demo_password=</replacetoken>
+			<replacevalue>demo_password=demo</replacevalue>
+		</replace>
+		<replace file="war/WEB-INF/classes/cubus_beans.xml">
+			<replacetoken>${cubus.config}</replacetoken>
+			<replacevalue>/etc/cubusmail/demo.properties</replacevalue>
+		</replace>
+		<antcall target="gwtcompile"/>
+		<war destfile="./build/demo.war">
+			<fileset dir="${war.dir}" />
+			<classes dir="${server.classes.dir}"/>
+		</war>
+	</target>
+	
+	
+	<target name="release" depends="war">
+		<mkdir dir="${dist.dir}" />		
+		<copy file="${war.file}" todir="${dist.dir}" />
+		<zip destfile="${dist.dir}/cubusmail.zip" >
+			<path refid="release.files"/>
+		</zip>
+		<tar destfile="${dist.dir}/cubusmail.tar.gz" compression="gzip">
+			<path refid="release.files"/>
+		</tar>
+	</target>
+	
+	
+	<target name="all" depends="clean, war, release">
+	</target>
+	
+	
+    <target name="test" depends="compile-test">
+        <mkdir dir="${test.results.dir}"/>
+        <junit haltonfailure="no" printsummary="on">
+            <classpath >
+                <pathelement location="${server.classes.dir}"/>
+                <pathelement location="${client.classes.dir}"/>
+                <pathelement location="${test.classes.dir}"/>
+				<fileset dir="${webapp.lib.dir}" includes="**/*.jar" />
+				<fileset dir="${lib.dir}" includes="**/*.jar" />
+				<fileset dir="${gwt.dir}" includes="gwt-user.jar" />
+            </classpath>
+            <formatter type="brief" usefile="false"/>
+            <formatter type="xml" />
+            <batchtest todir="${test.results.dir}" >
+                <fileset dir="${test.classes.dir}" includes="**/*UserAccountDaoTest.class"/>
+            </batchtest>
+        </junit>
+    </target>
+	
+</project>
+
