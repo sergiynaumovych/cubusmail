@@ -2,17 +2,20 @@
 <launchConfiguration type="com.google.gdt.eclipse.suite.webapp">
 <stringAttribute key="com.google.gwt.eclipse.core.URL" value="cubusmail.jsp"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/cubusmail"/>
+<listEntry value="/cubusmail_0.1_alpha2"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="4"/>
 </listAttribute>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="DYLD_FRAMEWORK_PATH" value="/Users/schlierf/cubusmail/WebKit.app/Contents/Frameworks/10.5"/>
+</mapAttribute>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="com.google.gwt.eclipse.core.moduleClasspathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="cubusmail"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xss2048k -Xmx1024M -Dcubus.config=/Users/schlierf/cubusmail/projects/cubusmail/etc/cubus_mac.properties"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="cubusmail_0.1_alpha2"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1024M -Dcubus.config=/Users/schlierf/cubusmail/projects/cubusmail/etc/cubus_mac.properties"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="/cubusmail_0.1_alpha2/war"/>
 </launchConfiguration>
